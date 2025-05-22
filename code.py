@@ -14,6 +14,7 @@ from ultralytics import YOLO, YOLOE
 
 def temp(n):
   print(n+3)
+  print('sd')
 
 # use the BB's
 # TBD - use the masks
