@@ -19,6 +19,7 @@ def temp(n):
 # TBD - use the masks
 def get_raw_YOLO_detections(video, yolo_model):
   results = yolo_model.predict(video, agnostic_nms=True)
+  return results
   
 
 # video is an mp4 file or some compatible source/iterator
