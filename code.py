@@ -2,6 +2,8 @@ import torch
 import imageio.v3 as iio
 import cv2
 import numpy as np
+import networkx as nx
+
 
 from ultralytics import YOLO, YOLOE
 
@@ -84,6 +86,66 @@ def create_tie_points(video, video_chunk_size=100, overlap=20, grid_size=20):
           break
 
   return tie_points
+
+# yolo_data is the output from make_yolo_data()
+def get_tracks_by_nodegroups(yolo_data, G, node_groups):
+    for comp in node_groups:
+        # build a sorted, enriched list of dicts
+        seq = []
+        for (f, d) in sorted(comp, key=lambda x: x[0]):
+            det = dict(yolo_data[f][d])      # copy bbox/conf/cls
+            det['frame'] = f
+            seq.append(det)
+        tracks.append(seq)
+    return tracks
+
+def build_tracks(yolo_data, tie_point_bunches):
+    """
+    Graph‐based grouping. Returns:
+      [ [ {'frame':…, 'bbox':…, 'conf':…, 'cls':…}, … ], … ]
+    """
+    G = nx.Graph()
+
+    # 1) Add every detection as a node
+    for frame_idx, dets in yolo_data.items():
+        for det_idx in range(len(dets)):
+            G.add_node((frame_idx, det_idx))
+
+    print(G)
+
+    # 2) Link detections via tie‐points
+    for c, chunk in enumerate(tie_point_bunches):
+        frames = chunk['frame_ids']
+        tracks = chunk['tracks'][0,:]      # shape (T,N,2)
+        vis    = chunk['visible'][0,:]     # shape (T,N)
+        T, N, _ = tracks.shape
+
+        for t in range(T):
+            f1 = frames[t]
+            for n in range(N):
+                if not vis[t,n]:
+                    continue
+                det1 = find_matching_bbox(f1, tracks[t,n], yolo_data)
+                if det1 is None:
+                    continue
+                # connect to any later appearance of same tie‐point
+                for t2 in range(t+1, T):
+                    if not vis[t2,n]:
+                        continue
+                    f2 = frames[t2]
+                    det2 = find_matching_bbox(f2, tracks[t2,n], yolo_data)
+                    if det2 is None:
+                        continue
+                    # add edge with metadata
+                    G.add_edge((f1, det1), (f2, det2), tie_point_index=n, coord1=tuple(tracks[t, n]), coord2=tuple(tracks[t2, n]))
+        print(c, G)
+
+    # 3) Extract connected components as rich tracks
+    # tracks = []
+    comps = [c for c in nx.connected_components(G) if len(c)>1]
+    tracks = get_tracks_by_nodegroups(yolo_data, G, comps)
+
+    return tracks, G
 
 
   
