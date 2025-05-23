@@ -98,7 +98,7 @@ def get_tracks_by_nodegroups(yolo_data, G, node_groups):
             det['frame'] = f
             det['box_id'] = d
             seq.append(det)
-        tracks.append(seq)
+        tracks.append({'track':seq, 'nodes':comp})
     return tracks
 
 def build_tie_graph(yolo_data, tie_point_bunches):
