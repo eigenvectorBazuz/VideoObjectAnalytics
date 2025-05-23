@@ -99,7 +99,7 @@ def get_tracks_by_nodegroups(yolo_data, G, node_groups):
         tracks.append(seq)
     return tracks
 
-def build_tracks(yolo_data, tie_point_bunches):
+def build_tie_graph(yolo_data, tie_point_bunches):
     """
     Graph‐based grouping. Returns:
       [ [ {'frame':…, 'bbox':…, 'conf':…, 'cls':…}, … ], … ]
@@ -140,16 +140,8 @@ def build_tracks(yolo_data, tie_point_bunches):
                     G.add_edge((f1, det1), (f2, det2), tie_point_index=n, coord1=tuple(tracks[t, n]), coord2=tuple(tracks[t2, n]))
         print(c, G)
 
-    # 3) Extract connected components as rich tracks
-    # tracks = []
-    comps = [c for c in nx.connected_components(G) if len(c)>1]
-    tracks = get_tracks_by_nodegroups(yolo_data, G, comps)
+    return G
 
-    return tracks, G
-
-
-  
-  
   
 
 # video is an mp4 file or some compatible source/iterator
