@@ -1,6 +1,7 @@
 import torch
 import imageio.v3 as iio
 import cv2
+import numpy as np
 
 from ultralytics import YOLO, YOLOE
 
