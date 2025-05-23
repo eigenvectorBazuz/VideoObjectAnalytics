@@ -96,6 +96,7 @@ def get_tracks_by_nodegroups(yolo_data, G, node_groups):
         for (f, d) in sorted(comp, key=lambda x: x[0]):
             det = dict(yolo_data[f][d])      # copy bbox/conf/cls
             det['frame'] = f
+            det['vertex'] = d
             seq.append(det)
         tracks.append(seq)
     return tracks
