@@ -89,6 +89,7 @@ def create_tie_points(video, video_chunk_size=100, overlap=20, grid_size=20):
 
 # yolo_data is the output from make_yolo_data()
 def get_tracks_by_nodegroups(yolo_data, G, node_groups):
+    tracks = []
     for comp in node_groups:
         # build a sorted, enriched list of dicts
         seq = []
