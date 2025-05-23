@@ -65,6 +65,7 @@ def create_tie_points(frames, video_chunk_size=100, overlap=20, grid_size=20):
   for start in range(0, num_frames, step):
       end = min(start + video_chunk_size, num_frames)
       frame_ids = list(range(start, end))
+      print(f'processing {start} to {end}')
 
       # build one-chunk tensor [1, T, C, H, W]
       chunk_tensor = (
@@ -76,7 +77,7 @@ def create_tie_points(frames, video_chunk_size=100, overlap=20, grid_size=20):
 
       # offline cotracker call (no is_first_step / query args)
       pred_tracks, pred_visibility = cotracker(
-          video_chunk=chunk_tensor,
+          video=chunk_tensor,
           grid_size=grid_size
       )
 
