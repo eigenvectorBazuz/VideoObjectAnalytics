@@ -82,3 +82,34 @@ def display_track_on_frames(track, video_path, stop=None):
     
     cap.release()
 
+def make_yolo_data(yolo_preds):
+    """
+    Turn ultralytics Results into:
+      { frame_idx: [ {'bbox':(x1,y1,x2,y2), 'conf':float, 'cls':int}, … ] }
+    """
+    yolo_data = {}
+    for frame_idx, res in enumerate(yolo_preds):
+        dets = []
+        boxes = res.boxes.xyxy.cpu().numpy()
+        confs = res.boxes.conf.cpu().numpy()
+        clss  = res.boxes.cls.cpu().numpy()
+        for box, c, cl in zip(boxes, confs, clss):
+            dets.append({
+                'bbox': tuple(box.tolist()),
+                'conf': float(c),
+                'cls':  int(cl)
+            })
+        yolo_data[frame_idx] = dets
+    return yolo_data
+
+def find_matching_bbox(frame_idx, point, yolo_data):
+    """
+    Return index of the box in yolo_data[frame_idx] containing point, or None.
+    """
+    x, y = point
+    for idx, det in enumerate(yolo_data.get(frame_idx, [])):
+        x1,y1,x2,y2 = det['bbox']
+        if x1 <= x <= x2 and y1 <= y <= y2:
+            return idx
+    return None
+
