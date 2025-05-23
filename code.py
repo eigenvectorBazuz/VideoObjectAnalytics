@@ -43,6 +43,7 @@ def resize_video(video, new_sz):
 
   return np.stack(resized_frames)
 
+# using the python convention, frames from start to end-1.
 def get_video_chunk(video, start, end):
   frames = []
   reader = iio.imiter(
@@ -54,7 +55,7 @@ def get_video_chunk(video, start, end):
           '-vsync',   '0',                                     # disable frame-rate correction
       ]
   )
-  for frame_number, frame in zip(range(start, end+1), reader):
+  for frame_number, frame in zip(range(start, end), reader):
     frames.append(frame)
   return np.stack(frames)
 
