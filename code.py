@@ -79,7 +79,7 @@ def create_tie_points(video, video_chunk_size=100, overlap=20, grid_size=20):
   """
   tie_points = []
   step = video_chunk_size - overlap
-  num_frames = len(frames)
+  num_frames = count_frames(video)
 
   for start in range(0, num_frames, step):
       end = min(start + video_chunk_size, num_frames)
@@ -87,12 +87,7 @@ def create_tie_points(video, video_chunk_size=100, overlap=20, grid_size=20):
       print(f'processing {start} to {end}')
 
       # build one-chunk tensor [1, T, C, H, W]
-      chunk_tensor = (
-          torch.tensor(frames[frame_ids])
-               .permute(0, 3, 1, 2)[None]
-               .float()
-               .to(device)
-      )
+      chunk_tensor = get_video_chunk(video, start, end)
 
       # offline cotracker call 
       pred_tracks, pred_visibility = cotracker(
