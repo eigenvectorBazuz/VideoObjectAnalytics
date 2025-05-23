@@ -47,12 +47,49 @@ def get_raw_YOLO_detections(video, yolo_model):
 # The input is frames rather than video because of reasons 
 # (the offline cotracker does not work with raw mp4 and preprocessing is better done in bulk in advance). Still TBD better software design.
 def create_tie_points(frames, video_chunk_size=100, overlap=20, grid_size=20):
+  """
+  Split `frames` into overlapping chunks, run offline cotracker on each,
+  and collect the per-chunk tie points.
+
+  Returns:
+    List of dicts, each with keys:
+      - 'frame_ids': list of global frame indices in that chunk
+      - 'tracks': tensor of predicted tracks for that chunk
+      - 'visible': tensor of predicted visibility for that chunk
+  """
   tie_points = []
-  select = range(0,video_chunk_size)
-  video_chunk = torch.tensor(frames[select]).permute(0, 3, 1, 2)[None].float().to(device)  
-  pred_tracks, pred_visibility = cotracker(video_chunk, grid_size=grid_size) 
-  tie_points.append({'frame_ids':select, 'tracks':pred_tracks, 'visible':pred_visibility})
-  
+  step = video_chunk_size - overlap
+  num_frames = len(frames)
+
+  for start in range(0, num_frames, step):
+      end = min(start + video_chunk_size, num_frames)
+      frame_ids = list(range(start, end))
+
+      # build one-chunk tensor [1, T, C, H, W]
+      chunk_tensor = (
+          torch.tensor(frames[frame_ids])
+               .permute(0, 3, 1, 2)[None]
+               .float()
+               .to(device)
+      )
+
+      # offline cotracker call (no is_first_step / query args)
+      pred_tracks, pred_visibility = cotracker(
+          video_chunk=chunk_tensor,
+          grid_size=grid_size
+      )
+
+      tie_points.append({
+          "frame_ids": frame_ids,
+          "tracks": pred_tracks,
+          "visible": pred_visibility,
+      })
+
+      # stop once we've covered the last frame
+      if end == num_frames:
+          break
+
+  return tie_points
 
 
   
