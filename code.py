@@ -34,7 +34,7 @@ def resize_video(video, new_sz):
   
   reader.close()
 
-  return resized_frames
+  return np.stack(resized_frames)
 
 # use the BB's
 # TBD - use the masks
