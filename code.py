@@ -22,6 +22,12 @@ cotracker = torch.hub.load("facebookresearch/co-tracker", "cotracker3_offline").
 # clip_file = '/content/drive/MyDrive/BR/seg0.mp4'
 # track_results = model.track(clip_file, agnostic_nms=True, persist=True, tracker="/content/drive/MyDrive/BR/botsort_modified.yaml")  # Tracking with default tracker
 
+def count_frames(video):
+  cap = cv2.VideoCapture(video)
+  n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+  cap.release()
+  return n_frames
+
 
 def resize_video(video, new_sz):
   reader = iio.imiter(video, plugin="FFMPEG")  
@@ -58,11 +64,9 @@ def get_raw_YOLO_detections(video, yolo_model):
   results = yolo_model.predict(video, agnostic_nms=True)
   return results
 
-# frames - has the entire (resized) frame set of the video
 # TBD - use the query mechanism of cotracker to continue the same tie points across chunks
-# The input is frames rather than video because of reasons 
-# (the offline cotracker does not work with raw mp4 and preprocessing is better done in bulk in advance). Still TBD better software design.
-def create_tie_points(frames, video_chunk_size=100, overlap=20, grid_size=20):
+# TBD - resize to save time and resize back the results.
+def create_tie_points(video, video_chunk_size=100, overlap=20, grid_size=20):
   """
   Split `frames` into overlapping chunks, run offline cotracker on each,
   and collect the per-chunk tie points.
