@@ -37,6 +37,21 @@ def resize_video(video, new_sz):
 
   return np.stack(resized_frames)
 
+def get_video_chunk(video, start, end):
+  frames = []
+  reader = iio.imiter(
+      video,
+      plugin='FFMPEG',
+      # no input_params here, since we're not seeking by time
+      output_params=[
+          '-vf',      f'select=between(n\\,{start}\\,{end})',  # only keep frames n∈[100,200]
+          '-vsync',   '0',                                     # disable frame-rate correction
+      ]
+  )
+  for frame_number, frame in zip(range(start, end+1), reader):
+    frames.append(frame)
+  return frames
+
 # use the BB's
 # TBD - use the masks
 def get_raw_YOLO_detections(video, yolo_model):
