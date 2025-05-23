@@ -23,7 +23,7 @@ cotracker = torch.hub.load("facebookresearch/co-tracker", "cotracker3_offline").
 
 
 def resize_video(video, new_sz):
-  reader = iio.imiter(url, plugin="FFMPEG")  
+  reader = iio.imiter(video, plugin="FFMPEG")  
   
   # Iterate frame by frame, resize, and collect
   resized_frames = []
