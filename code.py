@@ -75,7 +75,7 @@ def create_tie_points(frames, video_chunk_size=100, overlap=20, grid_size=20):
                .to(device)
       )
 
-      # offline cotracker call (no is_first_step / query args)
+      # offline cotracker call 
       pred_tracks, pred_visibility = cotracker(
           video=chunk_tensor,
           grid_size=grid_size
