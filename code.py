@@ -50,7 +50,7 @@ def get_video_chunk(video, start, end):
   )
   for frame_number, frame in zip(range(start, end+1), reader):
     frames.append(frame)
-  return frames
+  return np.stack(frames)
 
 # use the BB's
 # TBD - use the masks
