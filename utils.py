@@ -4,6 +4,7 @@ import imageio.v3 as iio
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter, defaultdict
+from itertools import combinations
 
 import pulp
 
