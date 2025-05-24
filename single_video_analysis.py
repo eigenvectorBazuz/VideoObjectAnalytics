@@ -11,10 +11,9 @@ from utils import count_frames, get_video_chunk
 from utils import display_track_on_frames
 from utils import make_yolo_data, find_matching_bbox
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph
 
-# Offline CoTracker:
-cotracker = torch.hub.load("facebookresearch/co-tracker", "cotracker3_offline").to(device)
+
 
 
 # # Load a model
