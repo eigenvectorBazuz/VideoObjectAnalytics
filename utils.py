@@ -1,4 +1,5 @@
 import cv2
+import networkx as nx
 import imageio.v3 as iio
 import numpy as np
 import matplotlib.pyplot as plt
@@ -123,8 +124,23 @@ def find_matching_bbox(frame_idx, point, yolo_data):
             return idx
     return None
 
-import pulp
-import networkx as nx
+def build_separation_pairs(nodes):
+    """
+    nodes: iterable of (frame_id, box_id)
+    returns: list of ((f, b1), (f, b2)) for every pair of box_ids
+             within the same frame f
+    """
+    by_frame = defaultdict(list)
+    for f, b in nodes:
+        by_frame[f].append((f, b))
+    
+    pairs = []
+    for group in by_frame.values():
+        if len(group) > 1:
+            # all 2-combinations among boxes in this frame
+            pairs.extend(combinations(group, 2))
+    return pairs
+
 
 def multicut_ilp_pulp(G, pairs):
     nodes = list(G.nodes())
