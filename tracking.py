@@ -6,7 +6,7 @@ from itertools import combinations
 
 from utils import count_frames, get_video_chunk
 from utils import has_duplicates, get_repeats #ironic
-from utils import multicut_ilp_pulp
+from utils import build_separation_pairs, multicut_ilp_pulp
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
