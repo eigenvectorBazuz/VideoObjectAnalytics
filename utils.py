@@ -154,3 +154,25 @@ def multicut_ilp_pulp(G, pairs):
     cut_edges = {e for e in edges if pulp.value(x[e]) > 0.5}
     return cut_edges
 
+# # Test
+# G = nx.path_graph(6)
+# pairs = [(0, 5), (1, 4)]
+# cutset = multicut_ilp_pulp(G, pairs)
+# print("Cut edges:", cutset)
+# H = G.copy()
+# H.remove_edges_from(cutset)
+# print("Components:", list(nx.connected_components(H)))
+
+# # Build a balanced binary tree of height 3 (15 nodes)
+# G = nx.balanced_tree(2, 3)
+
+# # Choose some leaf-pairs to separate
+# pairs = [(8, 9), (10, 11), (12, 13)]
+
+# cutset = multicut_ilp_pulp(G, pairs)
+# print(cutset)
+# # print(components)
+# print('sdfsfd')
+
+# nx.draw(G, with_labels=True)
+
