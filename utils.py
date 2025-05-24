@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter
 
+import pulp
+
 
 def has_duplicates(lst):
     return len(lst) != len(set(lst))
@@ -120,4 +122,35 @@ def find_matching_bbox(frame_idx, point, yolo_data):
         if x1 <= x <= x2 and y1 <= y <= y2:
             return idx
     return None
+
+import pulp
+import networkx as nx
+
+def multicut_ilp_pulp(G, pairs):
+    nodes = list(G.nodes())
+    edges = list(G.edges())
+    # Problem definition
+    prob = pulp.LpProblem("multicut", pulp.LpMinimize)
+    # Edge cut variables
+    x = {e: pulp.LpVariable(f"x_{e}", cat="Binary") for e in edges}
+    # Label variables
+    y = {}
+    for idx, (s, t) in enumerate(pairs):
+        for v in nodes:
+            y[(idx, v)] = pulp.LpVariable(f"y_{idx}_{v}", cat="Binary")
+        # s=0, t=1
+        prob += y[(idx, s)] == 0
+        prob += y[(idx, t)] == 1
+        # cut constraints
+        for u, v in edges:
+            prob += y[(idx, u)] - y[(idx, v)] <= x[(u, v)]
+            prob += y[(idx, v)] - y[(idx, u)] <= x[(u, v)]
+
+    # Objective
+    prob += pulp.lpSum(x[e] for e in edges)
+
+    prob.solve(pulp.PULP_CBC_CMD(msg=False))
+
+    cut_edges = {e for e in edges if pulp.value(x[e]) > 0.5}
+    return cut_edges
 
