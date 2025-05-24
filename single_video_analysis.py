@@ -3,13 +3,13 @@ import imageio.v3 as iio
 import cv2
 import numpy as np
 import networkx as nx
-
+from networkx.algorithms.community import greedy_modularity_communities
 
 from ultralytics import YOLO, YOLOE
 
 from utils import count_frames, get_video_chunk
 from utils import display_track_on_frames
-from utils import make_yolo_data, find_matching_bbox
+from utils import make_yolo_data
 
 from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight
 
@@ -36,7 +36,15 @@ def get_raw_YOLO_detections(video, yolo_model):
 # TBD - print a list of supported models and make a switch case
 def discover_objects_in_video(video, yolo_model_name):
   yolo_model = YOLO(yolo_model_name) # unless it's a YOLOE model....
-  yolo_preds = voa_code.get_raw_YOLO_detections(video, yolo_model)
-  pass
+  yolo_preds = get_raw_YOLO_detections(video, yolo_model)
+  yd = make_yolo_data(yolo_preds)
+  
+  ties = create_tie_points(video, video_chunk_size=250, overlap=10, grid_size=20)
+  G = build_tie_graph_nextsight(yd, ties)
+  communities = greedy_modularity_communities(G)
+  comms = [c for c in communities if len(c)>1]
+
+  tracks = get_tracks_by_nodegroups(yd, G, comms)
+  
 
 
