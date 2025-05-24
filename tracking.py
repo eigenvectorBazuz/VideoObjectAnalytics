@@ -78,7 +78,7 @@ def get_tracks_by_nodegroups(yolo_data, G, node_groups):
             det['frame'] = f
             det['box_id'] = d
             seq.append(det)
-        tracks.append({'track':seq, 'nodes':comp})
+        tracks.append({'track':seq, 'nodes':comp, 'subgraph':G.subgraph(comp)})
     return tracks
 
 def build_tie_graph(yolo_data, tie_point_bunches):
@@ -185,13 +185,14 @@ def check_track(t):
         return False, get_repeats(track_frames)
     return True, None
 
-def split_track(yolo_data, t, G):
+def split_track(t):
     flag, error_frames = check_track(t['track'])
     if flag:
         return t
     
     pairs = build_separation_pairs(t['nodes'])
-    S = G.subgraph(t['nodes'])
+    # S = G.subgraph(t['nodes'])
+    S = t['subgraph']
     cutset = multicut_ilp_pulp(S, pairs)
     S_cut = S.edge_subgraph(set(S.edges()) - set(cutset)).copy()
 
