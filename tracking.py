@@ -198,7 +198,12 @@ def split_track(t):
 
 
     comps = [c for c in nx.connected_components(S_cut) if len(c)>1]
-    t_split = get_tracks_by_nodegroups(yolo_data, S, comps)
+    # t_split = get_tracks_by_nodegroups(yolo_data, S, comps)
+    t_split = []
+    for c in comps:
+      piece = [app for app in t['track'] if (app['frame'], app['box_id']) in c]
+      subtrack = {'track':piece, 'nodes':c, 'subgraph':S.subgraph(c)}
+      t_split.append(subtrack)
     return t_split
 
     
