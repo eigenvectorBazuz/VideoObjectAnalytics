@@ -1,6 +1,11 @@
 import numpy as np
 import networkx as nx
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Offline CoTracker:
+cotracker = torch.hub.load("facebookresearch/co-tracker", "cotracker3_offline").to(device)
+
 
 # TBD - use the query mechanism of cotracker to continue the same tie points across chunks
 # TBD - resize to save time and resize back the results.
