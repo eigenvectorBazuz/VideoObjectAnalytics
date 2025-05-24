@@ -45,6 +45,7 @@ def discover_objects_in_video(video, yolo_model_name):
   comms = [c for c in communities if len(c)>1]
 
   tracks = get_tracks_by_nodegroups(yd, G, comms)
+  return tracks
   
 
 
