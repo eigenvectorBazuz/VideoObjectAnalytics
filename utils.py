@@ -192,3 +192,93 @@ def multicut_ilp_pulp(G, pairs):
 
 # nx.draw(G, with_labels=True)
 
+
+def annotate_video_with_tracks(
+    input_video_path,
+    tracks,
+    output_video_path,
+    track_ids=None,
+    palette=None
+):
+    """
+    Draws bounding boxes and TRACK IDs on an input video based on track data.
+
+    Args:
+        input_video_path (str): Path to the original MP4 video.
+        tracks (list of dict): List where each dict has a 'track' key mapping to a list of
+            dicts with keys 'frame', 'bbox' (x1,y1,x2,y2).
+        output_video_path (str): Path to save the annotated video.
+        track_ids (list of int or None): List of IDs to assign to each track in `tracks`.
+            If None, defaults to indices [0, 1, ..., len(tracks)-1].
+        palette (list of tuple): Optional list of BGR color tuples to cycle through.
+    """
+    # Determine track IDs
+    if track_ids is None:
+        track_ids = list(range(len(tracks)))
+    assert len(track_ids) == len(tracks), "track_ids must match length of tracks list"
+
+    # Build frame -> list of (bbox, track_id)
+    frame_boxes = defaultdict(list)
+    for tidx, track_entry in enumerate(tracks):
+        tid = track_ids[tidx]
+        for item in track_entry['track']:
+            frame = item['frame']
+            bbox = item['bbox']
+            frame_boxes[frame].append((bbox, tid))
+
+    # Default simple palette if none provided (BGR format)
+    default_palette = [
+        (0, 0, 255),    # Red
+        (255, 0, 0),    # Blue
+        (0, 255, 255),  # Yellow
+        (0, 255, 0),    # Green
+        (203, 192, 255) # Pink
+    ]
+    palette = palette or default_palette
+
+    # Map each track_id to a consistent color
+    unique_tids = list(track_ids)
+    color_map = {tid: palette[i % len(palette)] for i, tid in enumerate(unique_tids)}
+
+    # Open the video
+    cap = cv2.VideoCapture(input_video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+
+    frame_idx = 0
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Draw boxes and track IDs for this frame
+        for bbox, tid in frame_boxes.get(frame_idx, []):
+            x1, y1, x2, y2 = map(int, bbox)
+            color = color_map[tid]
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+            cv2.putText(
+                frame, str(tid),
+                (x1, y1 - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.9, color, 2,
+                lineType=cv2.LINE_AA
+            )
+
+        out.write(frame)
+        frame_idx += 1
+
+    cap.release()
+    out.release()
+
+# Example usage:
+# annotate_video_with_tracks(
+#     "input.mp4",
+#     tracks_list,           # list of dicts, each with 'track'
+#     "annotated.mp4",
+#     track_ids=[101, 102, 103]  # optional custom IDs
+# )
+
+
