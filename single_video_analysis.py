@@ -10,7 +10,7 @@ from ultralytics import YOLO, YOLOE
 from utils import display_track_on_frames
 from utils import make_yolo_data
 
-from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight
+from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight, split_track
 
 
 # # Load a model
@@ -27,6 +27,7 @@ from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_grap
 
 # TBD - merge several models, either YOLO/YOLOE or DETR ones and return a unified detections list in YOLO format. 
 # the input in this case will be either a string or a list of strings.
+# TBD - perhaps set a confidence threshold?
 def get_raw_YOLO_detections(video, yolo_model):
   results = yolo_model.predict(video, agnostic_nms=True)
   return results
@@ -43,7 +44,9 @@ def discover_objects_in_video(video, yolo_model_name):
   communities = greedy_modularity_communities(G)
   comms = [c for c in communities if len(c)>1]
 
-  tracks = get_tracks_by_nodegroups(yd, G, comms)
+  raw_tracks = get_tracks_by_nodegroups(yd, G, comms)
+  tracks = [child for t in raw_tracks for child in split_track(t)]
+  # TBD - now merge track/tracklets by ReID
   return tracks
   
 
