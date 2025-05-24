@@ -41,7 +41,7 @@ def discover_objects_in_video(video, yolo_model_name):
   
   ties = create_tie_points(video, video_chunk_size=250, overlap=10, grid_size=20)
   G = build_tie_graph_nextsight(yd, ties)
-  communities = greedy_modularity_communities(G)
+  communities = greedy_modularity_communities(G) # TBD - use Louvain
   comms = [c for c in communities if len(c)>1]
 
   raw_tracks = get_tracks_by_nodegroups(yd, G, comms)
