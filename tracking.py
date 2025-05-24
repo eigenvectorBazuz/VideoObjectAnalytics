@@ -1,5 +1,7 @@
 import numpy as np
 import networkx as nx
+from collections import Counter, defaultdict
+from itertools import combinations
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -168,6 +170,48 @@ def build_tie_graph_nextsight(yolo_data, tie_point_bunches):
         print(c, G)
 
     return G
+
+
+def check_track(t):
+    track_frames = [app['frame'] for app in t]
+    # print(track_frames)
+    if has_duplicates(track_frames):
+        return False, get_repeats(track_frames)
+    return True, None
+
+def split_track(yolo_data, t, G):
+    flag, error_frames = check_track(t['track'])
+    if flag:
+        return t
+    
+    pairs = build_separation_pairs(t['nodes'])
+    S = G.subgraph(t['nodes'])
+    cutset = multicut_ilp_pulp(S, pairs)
+    S_cut = S.edge_subgraph(set(S.edges()) - set(cutset)).copy()
+
+
+    comps = [c for c in nx.connected_components(S_cut) if len(c)>1]
+    t_split = voa_code.get_tracks_by_nodegroups(yolo_data, S, comps)
+    return t_split
+
+    
+    
+def build_separation_pairs(nodes):
+    """
+    nodes: iterable of (frame_id, box_id)
+    returns: list of ((f, b1), (f, b2)) for every pair of box_ids
+             within the same frame f
+    """
+    by_frame = defaultdict(list)
+    for f, b in nodes:
+        by_frame[f].append((f, b))
+    
+    pairs = []
+    for group in by_frame.values():
+        if len(group) > 1:
+            # all 2-combinations among boxes in this frame
+            pairs.extend(combinations(group, 2))
+    return pairs
 
 
   
