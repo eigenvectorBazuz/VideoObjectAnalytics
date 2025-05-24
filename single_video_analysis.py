@@ -47,7 +47,9 @@ def discover_objects_in_video(video, yolo_model_name):
   raw_tracks = get_tracks_by_nodegroups(yd, G, comms)
   tracks = [child for t in raw_tracks for child in split_track(t)]
   # TBD - now merge track/tracklets by ReID
-  return tracks
+  return tracks, {'yolo_preds':yolo_preds, 'ties':ties, 'G':G, 'raw_tracks'}
+
+
   
 
 
