@@ -11,7 +11,7 @@ from utils import count_frames, get_video_chunk
 from utils import display_track_on_frames
 from utils import make_yolo_data, find_matching_bbox
 
-from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph
+from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight
 
 
 
