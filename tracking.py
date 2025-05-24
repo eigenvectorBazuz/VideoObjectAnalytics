@@ -196,7 +196,7 @@ def split_track(yolo_data, t, G):
 
 
     comps = [c for c in nx.connected_components(S_cut) if len(c)>1]
-    t_split = voa_code.get_tracks_by_nodegroups(yolo_data, S, comps)
+    t_split = get_tracks_by_nodegroups(yolo_data, S, comps)
     return t_split
 
     
