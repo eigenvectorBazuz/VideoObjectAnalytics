@@ -14,8 +14,6 @@ from utils import make_yolo_data, find_matching_bbox
 from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight
 
 
-
-
 # # Load a model
 # model = YOLO("yolo11x.pt")  # pretrained YOLO11n model
 # model = YOLOE("yoloe-11l-seg-pf.pt")
@@ -28,8 +26,8 @@ from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_grap
 # track_results = model.track(clip_file, agnostic_nms=True, persist=True, tracker="/content/drive/MyDrive/BR/botsort_modified.yaml")  # Tracking with default tracker
 
 
-# use the BB's
-# TBD - use the masks
+# TBD - merge several models, either YOLO/YOLOE or DETR ones and return a unified detections list in YOLO format. 
+# the input in this case will be either a string or a list of strings.
 def get_raw_YOLO_detections(video, yolo_model):
   results = yolo_model.predict(video, agnostic_nms=True)
   return results
@@ -38,6 +36,7 @@ def get_raw_YOLO_detections(video, yolo_model):
 # TBD - print a list of supported models and make a switch case
 def discover_objects_in_video(video, yolo_model_name):
   yolo_model = YOLO(yolo_model_name) # unless it's a YOLOE model....
+  yolo_preds = voa_code.get_raw_YOLO_detections(video, yolo_model)
   pass
 
 
