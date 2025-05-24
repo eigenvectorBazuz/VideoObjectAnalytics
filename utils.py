@@ -2,6 +2,14 @@ import cv2
 import imageio.v3 as iio
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import Counter
+
+
+def has_duplicates(lst):
+    return len(lst) != len(set(lst))
+
+def get_repeats(lst):
+    return [item for item, cnt in Counter(lst).items() if cnt > 1]
 
 def count_frames(video):
   cap = cv2.VideoCapture(video)
