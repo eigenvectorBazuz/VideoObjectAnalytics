@@ -34,7 +34,7 @@ def get_raw_YOLO_detections(video, yolo_model):
 
 # video is an mp4 file or some compatible source/iterator
 # TBD - print a list of supported models and make a switch case
-def discover_objects_in_video(video, yolo_model_name):
+def discover_objects_in_video(video, yolo_model_name, return_data=False):
   yolo_model = YOLO(yolo_model_name) # unless it's a YOLOE model....
   yolo_preds = get_raw_YOLO_detections(video, yolo_model)
   yd = make_yolo_data(yolo_preds)
@@ -47,7 +47,10 @@ def discover_objects_in_video(video, yolo_model_name):
   raw_tracks = get_tracks_by_nodegroups(yd, G, comms)
   tracks = [child for t in raw_tracks for child in split_track(t)]
   # TBD - now merge track/tracklets by ReID
-  return tracks, {'yolo_preds':yolo_preds, 'ties':ties, 'G':G, 'raw_tracks'}
+  if return_data:
+    return tracks, {'yolo_preds':yolo_preds, 'ties':ties, 'G':G, 'raw_tracks'}
+  else:
+    return tracks
 
 
   
