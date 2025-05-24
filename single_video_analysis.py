@@ -7,7 +7,6 @@ from networkx.algorithms.community import greedy_modularity_communities
 
 from ultralytics import YOLO, YOLOE
 
-from utils import count_frames, get_video_chunk
 from utils import display_track_on_frames
 from utils import make_yolo_data
 
