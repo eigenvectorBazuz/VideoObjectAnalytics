@@ -142,7 +142,7 @@ def check_track(t):
 def split_track(t):
     flag, error_frames = check_track(t['track'])
     if flag:
-        return t
+        return [t]
     
     pairs = build_separation_pairs(t['nodes'])
     # S = G.subgraph(t['nodes'])
