@@ -116,5 +116,59 @@ def build_tie_graph(yolo_data, tie_point_bunches):
 
     return G
 
+
+def build_tie_graph_nextsight(yolo_data, tie_point_bunches):
+    G = nx.Graph()
+    nodes = [(f,i) for f, dets in yolo_data.items() for i in range(len(dets))]
+    G.add_nodes_from(nodes)
+
+    bboxes = {
+        f: np.array([det['bbox'] for det in dets], dtype=float)
+        for f, dets in yolo_data.items()
+    }
+
+    def _match_point(frame, point):
+        arr = bboxes.get(frame)
+        if arr is None or arr.size == 0:
+            return None
+        x, y = point
+        if hasattr(x, 'item'):
+            x = x.item(); y = y.item()
+        xs, ys, xe, ye = arr.T
+        mask = (xs <= x) & (x <= xe) & (ys <= y) & (y <= ye)
+        idxs = np.nonzero(mask)[0]
+        return int(idxs[0]) if idxs.size else None
+
+    for c, chunk in enumerate(tie_point_bunches):
+        frames = chunk['frame_ids']
+        tracks = chunk['tracks'][0]
+        vis    = chunk['visible'][0]
+        T, N = vis.shape
+
+        for n in range(N):
+            matched = {}
+            for t in range(T):
+                if not vis[t, n]:
+                    continue
+                f = frames[t]
+                pt = tuple(tracks[t, n])
+                det = _match_point(f, pt)
+                if det is not None:
+                    matched[t] = (f, det, pt)
+
+            times = sorted(matched)
+            for i in range(len(times)-1):
+                t1, t2 = times[i], times[i+1]
+                f1, d1, pt1 = matched[t1]
+                f2, d2, pt2 = matched[t2]
+                G.add_edge((f1,d1), (f2,d2),
+                           tie_point_index=n,
+                           coord1=pt1,
+                           coord2=pt2)
+        print(c, G)
+
+    return G
+
+
   
 
