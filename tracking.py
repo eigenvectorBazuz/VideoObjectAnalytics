@@ -79,50 +79,6 @@ def get_tracks_by_nodegroups(yolo_data, G, node_groups):
         tracks.append({'track':seq, 'nodes':comp, 'subgraph':G.subgraph(comp)})
     return tracks
 
-def build_tie_graph(yolo_data, tie_point_bunches):
-    """
-    Graph‐based grouping. Returns:
-      [ [ {'frame':…, 'bbox':…, 'conf':…, 'cls':…}, … ], … ]
-    """
-    G = nx.Graph()
-
-    # 1) Add every detection as a node
-    for frame_idx, dets in yolo_data.items():
-        for det_idx in range(len(dets)):
-            G.add_node((frame_idx, det_idx))
-
-    print(G)
-
-    # 2) Link detections via tie‐points
-    for c, chunk in enumerate(tie_point_bunches):
-        frames = chunk['frame_ids']
-        tracks = chunk['tracks'][0,:]      # shape (T,N,2)
-        vis    = chunk['visible'][0,:]     # shape (T,N)
-        T, N, _ = tracks.shape
-
-        for t in range(T):
-            f1 = frames[t]
-            for n in range(N):
-                if not vis[t,n]:
-                    continue
-                det1 = find_matching_bbox(f1, tracks[t,n], yolo_data)
-                if det1 is None:
-                    continue
-                # connect to any later appearance of same tie‐point
-                for t2 in range(t+1, T):
-                    if not vis[t2,n]:
-                        continue
-                    f2 = frames[t2]
-                    det2 = find_matching_bbox(f2, tracks[t2,n], yolo_data)
-                    if det2 is None:
-                        continue
-                    # add edge with metadata
-                    G.add_edge((f1, det1), (f2, det2), tie_point_index=n, coord1=tuple(tracks[t, n]), coord2=tuple(tracks[t2, n]))
-        print(c, G)
-
-    return G
-
-
 def build_tie_graph_nextsight(yolo_data, tie_point_bunches):
     G = nx.Graph()
     nodes = [(f,i) for f, dets in yolo_data.items() for i in range(len(dets))]
