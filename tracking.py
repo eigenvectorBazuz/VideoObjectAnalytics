@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 import networkx as nx
-from collections import defaultdict
 from itertools import combinations
 
 from utils import count_frames, get_video_chunk
