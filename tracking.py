@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from collections import Counter, defaultdict
+from collections import defaultdict
 from itertools import combinations
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
