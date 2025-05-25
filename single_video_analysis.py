@@ -51,6 +51,7 @@ def discover_objects_in_video(video, yolo_model_name, return_data=False):
     return tracks, {'yolo_preds':yolo_preds, 'ties':ties, 'G':G, 'raw_tracks':raw_tracks}
   else:
     return tracks
+    # tracks_sorted = sorted(raw_tracks, key=lambda t: min(item['frame'] for item in t['track']))
 
 
   
