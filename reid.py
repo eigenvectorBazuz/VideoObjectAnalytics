@@ -7,7 +7,7 @@ from torchreid.reid.metrics.distance import compute_distance_matrix
 
 extractor = FeatureExtractor(
     model_name = 'osnet_ain_x1_0',  # strong vehicle‐ReID backbone
-    device = device            # or 'cpu'
+    device = str(device)            # or 'cpu'
 )
 
 # the idea is to use reid features to see if two tracks refer to the same objects 
