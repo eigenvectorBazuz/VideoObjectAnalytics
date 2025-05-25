@@ -19,7 +19,7 @@ extractor = FeatureExtractor(
 # or the Hausdorff distance in embedding space.
 def CompareTracks(t1, t2):
     crops1 = [app['crop'] for app in t1['track']]
-    crops2 = [app['crop'] for app in t1['track']]
+    crops2 = [app['crop'] for app in t2['track']]
 
     feat1 = extractor(crops1)
     feat2 = extractor(crops2)
