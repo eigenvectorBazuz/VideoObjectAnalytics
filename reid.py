@@ -11,4 +11,4 @@ extractor = FeatureExtractor(
 
 # the idea is to use reid features to see if two tracks refer to the same objects - either within the same video or across different videos.
 def CompareTracks(t1, t2):
-  
+    pass
