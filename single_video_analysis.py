@@ -40,7 +40,7 @@ def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25):
   np.fill_diagonal(adj, False)
   H = nx.from_numpy_array(adj)
   commH = greedy_modularity_communities(H)
-  merged_tracks = [merge_tracks([tracks[i] for i in c], G) if len(c) > 1 else tracks[next(iter(c)) for c in commH]
+  merged_tracks = [merge_tracks([tracks[i] for i in c], G) if len(c) > 1 else tracks[next(iter(c))] for c in commH]
   final_tracks = [child for t in merged_tracks for child in split_track(t)]
   return final_tracks
 
