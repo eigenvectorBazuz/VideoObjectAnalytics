@@ -175,11 +175,13 @@ def multicut(G, pairs, method='auto', node_threshold=300, verbose=True):
     # Approximate via per‐pair s–t min‐cuts
     elif method == 'approx':
         cut_edges = set()
+        H = G.copy()  # to avoid setting attributes on the input graph!
+        nx.set_edge_attributes(H, 1, name='capacity')
         for s, t in pairs:
             # Single s–t min‐cut
-            _, (S, T) = nx.minimum_cut(G, s, t)
+            _, (S, T) = nx.minimum_cut(H, s, t)
             # Collect crossing edges
-            for u, v in G.edges():
+            for u, v in H.edges():
                 if (u in S and v in T) or (u in T and v in S):
                     cut_edges.add((u, v))
     else:
