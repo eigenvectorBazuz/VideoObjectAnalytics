@@ -1,17 +1,16 @@
 import torch
 import numpy as np
 import networkx as nx
+from itertools import chain
 
 from utils import count_frames, get_video_chunk
 from utils import has_duplicates, get_repeats #ironic
 from utils import build_separation_pairs, multicut_ilp_pulp
 
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Offline CoTracker:
 cotracker = torch.hub.load("facebookresearch/co-tracker", "cotracker3_offline").to(device)
-
 
 # TBD - use the query mechanism of cotracker to continue the same tie points across chunks
 # TBD - resize to save time and resize back the results.
@@ -159,6 +158,23 @@ def split_track(t):
       subtrack = {'track':piece, 'nodes':c, 'subgraph':S.subgraph(c)}
       t_split.append(subtrack)
     return t_split
+
+def merge_tracks(tracks, G):
+    """
+    tracks: List[dict], each with keys 'track' (list) and 'nodes' (iterable)
+    G:      your NetworkX graph (to build subgraph later)
+    """
+    merged_track = list(chain.from_iterable(t.get('track', []) for t in tracks))
+    merged_nodes = list(chain.from_iterable(t.get('nodes', []) for t in tracks))
+
+    merged_subgraph = G.subgraph(merged_nodes).copy()
+
+    return {
+        'track':    merged_track,
+        'nodes':    merged_nodes,
+        'subgraph': merged_subgraph
+    }
+
 
     
     
