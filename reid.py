@@ -21,6 +21,6 @@ def CompareTracks(t1, t2):
     feat1 = extractor(crops1)
     feat2 = extractor(crops2)
 
-    mat = compute_distance_matrix(feat1, feat2)
+    mat = compute_distance_matrix(feat1, feat2, 'cosine')
 
     return torch.mean(mat)
