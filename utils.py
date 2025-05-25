@@ -107,6 +107,7 @@ def make_yolo_data(yolo_preds):
         for box, c, cl in zip(boxes, confs, clss):
             x1, y1, x2, y2 = box
             # Crop the object using the bounding box coordinates
+            img = res.orig_img
             crop = img[int(y1):int(y2), int(x1):int(x2)]
             dets.append({
                 'bbox': tuple(box.tolist()),
