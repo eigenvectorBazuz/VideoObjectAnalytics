@@ -11,6 +11,7 @@ from utils import display_track_on_frames
 from utils import make_yolo_data
 
 from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight, split_track
+from reid import Encode, CompareTrackList
 
 
 # # Load a model
@@ -31,6 +32,15 @@ from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_grap
 def get_raw_YOLO_detections(video, yolo_model):
   results = yolo_model.predict(video, agnostic_nms=True)
   return results
+
+def merge_tracks_by_reid(tracks, mean_dst_th=0.25):
+  tracks = Encode(tracks)
+  dst = CompareTrackList(tracks)
+  adj = (dst < 0.25)
+  np.fill_diagonal(adj, False)
+  H = nx.from_numpy_array(adj)
+  commH = greedy_modularity_communities(H)
+  
 
 # video is an mp4 file or some compatible source/iterator
 # TBD - print a list of supported models and make a switch case
