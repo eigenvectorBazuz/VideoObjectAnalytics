@@ -105,10 +105,14 @@ def make_yolo_data(yolo_preds):
         confs = res.boxes.conf.cpu().numpy()
         clss  = res.boxes.cls.cpu().numpy()
         for box, c, cl in zip(boxes, confs, clss):
+            x1, y1, x2, y2 = box
+            # Crop the object using the bounding box coordinates
+            crop = img[int(y1):int(y2), int(x1):int(x2)]
             dets.append({
                 'bbox': tuple(box.tolist()),
                 'conf': float(c),
-                'cls':  int(cl)
+                'cls':  int(cl),
+                'crop': crop
             })
         yolo_data[frame_idx] = dets
     return yolo_data
