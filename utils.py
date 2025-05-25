@@ -146,7 +146,74 @@ def build_separation_pairs(nodes):
             pairs.extend(combinations(group, 2))
     return pairs
 
+def multicut(G, pairs, method='auto', node_threshold=300, verbose=True):
+    """
+    Multi‐cut a graph either exactly via ILP (PuLP) or approximately via per‐pair s–t min‐cuts.
 
+    Args:
+        G               : undirected NetworkX graph
+        pairs           : iterable of (s, t) node‐pairs to separate
+        method          : 'auto', 'exact', or 'approx'
+        node_threshold  : when method='auto', switch to approx if |V| > node_threshold
+        verbose         : if True, print which method is used
+
+    Returns:
+        set of edges (tuples) whose removal disconnects each s from its t
+    """
+    n = G.number_of_nodes()
+
+    # Decide method
+    if method == 'auto':
+        method = 'exact' if n <= node_threshold else 'approx'
+    if verbose:
+        print(f"Multicut on graph with {n} nodes using method='{method}'")
+
+    # Exact ILP via PuLP
+    if method == 'exact':
+        nodes = list(G.nodes())
+        edges = list(G.edges())
+        prob = pulp.LpProblem("multicut", pulp.LpMinimize)
+
+        # Edge‐cut binary vars
+        x = {e: pulp.LpVariable(f"x_{e}", cat="Binary") for e in edges}
+
+        # Label vars for each pair and node
+        y = {}
+        for idx, (s, t) in enumerate(pairs):
+            for v in nodes:
+                y[(idx, v)] = pulp.LpVariable(f"y_{idx}_{v}", cat="Binary")
+            # fix labels: s→0, t→1
+            prob += y[(idx, s)] == 0
+            prob += y[(idx, t)] == 1
+            # enforce cut constraints
+            for u, v in edges:
+                prob += y[(idx, u)] - y[(idx, v)] <= x[(u, v)]
+                prob += y[(idx, v)] - y[(idx, u)] <= x[(u, v)]
+
+        # Objective: minimize number of cut edges
+        prob += pulp.lpSum(x[e] for e in edges)
+        prob.solve(pulp.PULP_CBC_CMD(msg=False))
+
+        # Gather cut edges
+        cut_edges = {e for e in edges if pulp.value(x[e]) > 0.5}
+
+    # Approximate via per‐pair s–t min‐cuts
+    elif method == 'approx':
+        cut_edges = set()
+        for s, t in pairs:
+            # Single s–t min‐cut
+            _, (S, T) = nx.minimum_cut(G, s, t)
+            # Collect crossing edges
+            for u, v in G.edges():
+                if (u in S and v in T) or (u in T and v in S):
+                    cut_edges.add((u, v))
+    else:
+        raise ValueError("method must be one of 'auto', 'exact', or 'approx'")
+
+    return cut_edges
+
+
+# deprecated, use multicut() instead.
 def multicut_ilp_pulp(G, pairs):
     nodes = list(G.nodes())
     edges = list(G.edges())
