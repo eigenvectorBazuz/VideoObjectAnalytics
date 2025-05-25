@@ -115,7 +115,7 @@ def make_yolo_data(yolo_preds):
                 'bbox': tuple(box.tolist()),
                 'conf': float(c),
                 'cls':  int(cl),
-                'crop': crop
+                'crop': crop,
                 'area': wn * hn
             })
         yolo_data[frame_idx] = dets
