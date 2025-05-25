@@ -149,7 +149,7 @@ def build_separation_pairs(nodes):
             pairs.extend(combinations(group, 2))
     return pairs
 
-def multicut(G, pairs, method='auto', node_threshold=300, verbose=True):
+def multicut(G, pairs, method='auto', node_threshold=100, verbose=True):
     """
     Multi‐cut a graph either exactly via ILP (PuLP) or approximately via per‐pair s–t min‐cuts.
 
