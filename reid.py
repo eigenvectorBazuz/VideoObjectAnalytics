@@ -35,7 +35,7 @@ def Encode(tracks, backbone=None):
         t['feat'] = feat
     return tracks
 
-def CompareTracks(tracks):
+def CompareTrackList(tracks):
     n = len(tracks)
     dist_matrix = np.zeros((n, n), dtype=float)
 
