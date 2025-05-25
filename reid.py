@@ -27,3 +27,26 @@ def CompareTracks(t1, t2):
     mat = compute_distance_matrix(feat1, feat2, 'cosine')
 
     return torch.mean(mat)
+
+def Encode(tracks, backbone=None):
+    for t in tracks:
+        crops = [app['crop'] for app in t['track']]
+        feat = extractor(crops)
+        t['feat'] = feat
+    return tracks
+
+def CompareTracks(tracks):
+    n = len(tracks)
+    dist_matrix = np.zeros((n, n), dtype=float)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            mat = compute_distance_matrix(tracks[i]['feat'], tracks[j]['feat'], 'cosine')
+            d = torch.mean(mat)
+            dist_matrix[i, j] = d
+            dist_matrix[j, i] = d
+        print(i)
+
+    return dist_matrix
+
+    
