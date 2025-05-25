@@ -14,6 +14,9 @@ extractor = FeatureExtractor(
 # - either within the same video or across different videos.
 # TBD - batch the calls.
 # TBD - use several feature extractors and combine the results somehow (how?)
+# another possible option - compare the means of the vectors.
+# or maybe return the median.
+# or the Hausdorff distance in embedding space.
 def CompareTracks(t1, t2):
     crops1 = [app['crop'] for app in t1['track']]
     crops2 = [app['crop'] for app in t1['track']]
