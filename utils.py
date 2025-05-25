@@ -104,8 +104,10 @@ def make_yolo_data(yolo_preds):
         boxes = res.boxes.xyxy.cpu().numpy()
         confs = res.boxes.conf.cpu().numpy()
         clss  = res.boxes.cls.cpu().numpy()
-        for box, c, cl in zip(boxes, confs, clss):
+        boxes_n = res.boxes.xywhn.cpu().numpy()
+        for box, c, cl, box_n in zip(boxes, confs, clss, boxes_n):
             x1, y1, x2, y2 = box
+            x1n, y1n, wn, hn = box_n
             # Crop the object using the bounding box coordinates
             img = res.orig_img
             crop = img[int(y1):int(y2), int(x1):int(x2)]
@@ -114,6 +116,7 @@ def make_yolo_data(yolo_preds):
                 'conf': float(c),
                 'cls':  int(cl),
                 'crop': crop
+                'area': wn * hn
             })
         yolo_data[frame_idx] = dets
     return yolo_data
