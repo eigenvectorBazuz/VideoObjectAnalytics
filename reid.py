@@ -10,6 +10,7 @@ extractor = FeatureExtractor(
     device = device            # or 'cpu'
 )
 
-# the idea is to use reid features to see if two tracks refer to the same objects - either within the same video or across different videos.
+# the idea is to use reid features to see if two tracks refer to the same objects 
+# - either within the same video or across different videos.
 def CompareGalleries(t1, t2):
     pass
