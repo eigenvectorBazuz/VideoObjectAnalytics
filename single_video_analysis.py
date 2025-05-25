@@ -50,12 +50,37 @@ def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25):
 
 # video is an mp4 file or some compatible source/iterator
 # TBD - print a list of supported models and make a switch case
-def discover_objects_in_video(video, yolo_model_name, return_data=False):
+def discover_objects_in_video(video, yolo_model_name, tie_point_params: dict | None = None, return_data=False):
+  """
+    Discover objects in a video using YOLO + tie-point tracking.
+
+    Parameters:
+    -----------
+    video :
+        Your video source (path or array).
+    yolo_model_name : str
+        Name or path of the YOLO model to load.
+    tie_point_params : dict, optional
+        Dict may contain any of:
+          - video_chunk_size: int (default 250)
+          - overlap:          int (default 10)
+          - grid_size:        int (default 20)
+    return_data : bool, default=False
+        If True, return raw detections and tie-points.
+  """
+  defaults = {
+        "video_chunk_size": 250,
+        "overlap": 10,
+        "grid_size": 20,
+    }
+  # Safely overlay any user-provided values
+  params = {**defaults, **(tie_point_params or {})}
+  
   yolo_model = YOLO(yolo_model_name) # unless it's a YOLOE model....
   yolo_preds = get_raw_YOLO_detections(video, yolo_model)
   yd = make_yolo_data(yolo_preds)
   
-  ties = create_tie_points(video, video_chunk_size=250, overlap=10, grid_size=20)
+  ties = create_tie_points(video, video_chunk_size=params["video_chunk_size"], overlap=params["overlap"], grid_size=params["grid_size"])
   G = build_tie_graph_nextsight(yd, ties)
   communities = greedy_modularity_communities(G) # TBD - use Louvain
   comms = [c for c in communities if len(c)>1]
