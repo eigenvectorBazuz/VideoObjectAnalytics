@@ -99,6 +99,7 @@ class VideoChatBot:
         for idx, frames in enumerate(chunks):
             desc = self._describe_chunk(frames, idx, user_prompt, **gen_overrides)
             descriptions.append(desc.strip())
+            print(idx)
 
         return "\n\n".join(descriptions)
 
