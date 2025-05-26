@@ -1,24 +1,16 @@
+from __future__ import annotations
+
 import cv2
 import torch 
 import os
+import numpy as np
+from pathlib import Path
+from typing import List, Sequence, Tuple, Union
 from PIL import Image
 
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 
 
-from __future__ import annotations
-from pathlib import Path
-from typing import List, Sequence, Tuple, Union
-
-import cv2
-import imageio.v3 as iio
-import numpy as np
-import torch
-from transformers import AutoProcessor
-
-# # LLaVA loads its own wrapper class dynamically, so this import is optional;
-# # leaving it here avoids type checkers from complaining.
-# from llava import LlavaForConditionalGeneration   # noqa: F401
 
 
 def _pick_model_id(size: str) -> str:
