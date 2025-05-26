@@ -1,9 +1,9 @@
-
-
-import cv2, torch, math, os
+import cv2, 
+import torch 
+import math 
+import os
 from PIL import Image
 
-!pip install bitsandbytes
 
 def sample_frames(path, n=12):
     """Return n evenly-spaced RGB PIL frames from an mp4 (uses OpenCV)."""
