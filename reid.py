@@ -39,14 +39,17 @@ def Encode(tracks, backbone=None):
         t['feat'] = feat
     return tracks
 
-def CompareTrackList(tracks):
+def CompareTrackList(tracks, mode='mean'):
     n = len(tracks)
     dist_matrix = np.zeros((n, n), dtype=float)
 
     for i in range(n):
         for j in range(i + 1, n):
             mat = compute_distance_matrix(tracks[i]['feat'], tracks[j]['feat'], 'cosine')
-            d = torch.mean(mat)
+            if mode == 'mean':
+                d = torch.mean(mat)
+            elif mode == 'median':
+                d = torch.median(mat)
             dist_matrix[i, j] = d
             dist_matrix[j, i] = d
         print(i)
