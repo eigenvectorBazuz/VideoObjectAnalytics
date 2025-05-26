@@ -147,7 +147,7 @@ def split_track(t):
     # S = G.subgraph(t['nodes'])
     S = t['subgraph']
     # cutset = multicut_ilp_pulp(S, pairs)
-    cutset = multicut(S, pairs, method='auto', node_threshold=150, verbose=True)
+    cutset = multicut(S, pairs, method='auto', node_threshold=100, verbose=True)
     S_cut = S.edge_subgraph(set(S.edges()) - set(cutset)).copy()
 
 
