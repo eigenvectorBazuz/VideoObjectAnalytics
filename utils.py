@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter, defaultdict
 from itertools import combinations
+import torch
 
 import pulp
 
@@ -247,6 +248,14 @@ def multicut_ilp_pulp(G, pairs):
 # print('sdfsfd')
 
 # nx.draw(G, with_labels=True)
+
+def stack_track_feats(track):
+    """
+    Given a single track = [ { ..., 'feat': torch.Tensor }, … ],
+    returns a (N×D) torch.Tensor stacking each 'feat' as a row.
+    """
+    return torch.stack([t['feat'] for t in track], dim=0).squeeze(1)
+
 
 
 def annotate_video_with_tracks(
