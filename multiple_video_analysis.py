@@ -72,6 +72,8 @@ def analyze_and_annotate_videos(videos_list, resdir):
 
     joint_ids = unify_track_ids(results, 0.25, 'mean')
 
+    print(joint_ids)
+
     os.makedirs(resdir, exist_ok=True)
 
     for video, ids, tracks in zip(videos_list, joint_ids, results):
