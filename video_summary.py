@@ -81,6 +81,7 @@ class VideoChatBot:
         quant_4bit: bool = False,
         target_hw: Tuple[int, int] = (360, 480),
         frames_per_chunk: int = 12,
+        fps: float = 30.0,
         **gen_kwargs,
     ):
         model_id = _pick_model_id(size)
@@ -128,14 +129,28 @@ class VideoChatBot:
         Returns a single concatenated text string (one paragraph per chunk).
         """
         chunks = list(self._iter_chunks(video_path))
-        descriptions: List[str] = []
+        # descriptions: List[str] = []
 
+        lines: List[str] = []
         for idx, frames in enumerate(chunks):
-            desc = self._describe_chunk(frames, idx, user_prompt, **gen_overrides)
-            descriptions.append(desc.strip())
-            print(idx)
+            # 1) get the raw description
+            desc = self._describe_chunk(frames, idx, user_prompt, **gen_overrides).strip()
 
-        return "\n\n".join(descriptions)
+            # 2) compute frame range → seconds → HH:MM:SS
+            start_frame = idx * self.frames_per_chunk
+            end_frame = min((idx + 1) * self.frames_per_chunk, total_frames)
+
+            start_sec = start_frame / self.fps
+            end_sec = end_frame / self.fps
+
+            start_ts = _format_timestamp(start_sec)
+            end_ts = _format_timestamp(end_sec)
+
+            # 3) prepend timestamp
+            lines.append(f"{start_ts} --> {end_ts} {desc}")
+
+        # join into a single text blob
+        return "\n".join(lines)
 
     # --------------------------------------------------------------------- #
     #  INTERNALS                                                            #
