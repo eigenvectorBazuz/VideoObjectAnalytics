@@ -131,6 +131,8 @@ class VideoChatBot:
         chunks = list(self._iter_chunks(video_path))
         # descriptions: List[str] = []
 
+        total_frames = count_frames(video_path)
+
         lines: List[str] = []
         for idx, frames in enumerate(chunks):
             # 1) get the raw description
