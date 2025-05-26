@@ -1,6 +1,5 @@
-import cv2, 
+import cv2
 import torch 
-import math 
 import os
 from PIL import Image
 
@@ -8,8 +7,6 @@ from transformers import AutoProcessor, LlavaForConditionalGeneration
 
 
 from __future__ import annotations
-import math
-import os
 from pathlib import Path
 from typing import List, Sequence, Tuple, Union
 
