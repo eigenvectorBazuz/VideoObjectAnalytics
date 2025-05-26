@@ -70,7 +70,7 @@ def analyze_and_annotate_videos(videos_list, resdir):
                                    include_final_split=False, return_data=False)
         results.append(tracks)
 
-    joint_ids = unify_track_ids(results, th=0.25, 'mean')
+    joint_ids = unify_track_ids(results, 0.25, 'mean')
 
     os.makedirs(resdir, exist_ok=True)
 
