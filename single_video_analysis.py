@@ -34,7 +34,7 @@ def get_raw_YOLO_detections(video, yolo_model):
   return results
 
 def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25, include_final_split=True):
-  # tracks = Encode(tracks)
+  tracks = Encode(tracks)
   dst = CompareTrackList(tracks)
   adj = (dst < 0.25)
   np.fill_diagonal(adj, False)
