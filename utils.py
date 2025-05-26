@@ -119,7 +119,7 @@ def make_yolo_data(yolo_preds):
                 'conf': float(c),
                 'cls':  int(cl),
                 'crop': crop,
-                'area': wn * hn                
+                'area': wn * hn,               
                 'feat': feat
             })
         yolo_data[frame_idx] = dets
