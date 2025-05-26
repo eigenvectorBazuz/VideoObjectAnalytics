@@ -180,7 +180,7 @@ def split_track_reid(t):
     t_split = []
     for c in comps:
       print(c)
-      piece = [app for app in t['track'] if (app['frame'], app['box_id']) in c]
+      piece = [app for i, app in enumerate(t['track']) if i in c]
       print(piece)
       subtrack = {'track':piece, 'nodes':c, 'subgraph':S.subgraph(c)}
       t_split.append(subtrack)
