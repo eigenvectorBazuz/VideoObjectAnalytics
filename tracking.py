@@ -165,8 +165,8 @@ def split_track(t):
 
 def split_track_reid(track):
     flag, error_frames = check_track(t['track'])
-      if flag:
-          return [t]
+    if flag:
+      return [t]
     st = stack_track_feats(t['track'])
     m = compute_distance_matrix(st, st, 'cosine')
     adj = (m.cpu().numpy() < 0.25)
