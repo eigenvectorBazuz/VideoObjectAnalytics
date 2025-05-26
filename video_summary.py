@@ -135,6 +135,7 @@ class VideoChatBot:
         for idx, frames in enumerate(chunks):
             # 1) get the raw description
             desc = self._describe_chunk(frames, idx, user_prompt, **gen_overrides).strip()
+            print(idx, desc)
 
             # 2) compute frame range → seconds → HH:MM:SS
             start_frame = idx * self.frames_per_chunk
