@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-from single_movie_analysis import discover_objects_in_video
+from single_video_analysis import discover_objects_in_video
 from reid import Encode, CompareTwoTrackLists
 from utils import annotate_video_with_tracks
 
