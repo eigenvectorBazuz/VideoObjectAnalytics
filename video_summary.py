@@ -10,7 +10,7 @@ from PIL import Image
 
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 
-from utils import count_frames
+from utils import count_frames, get_video_chunk
 
 
 
