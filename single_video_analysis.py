@@ -10,7 +10,7 @@ from ultralytics import YOLO, YOLOE
 from utils import display_track_on_frames
 from utils import make_yolo_data
 
-from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight, split_track, merge_tracks
+from tracking import create_tie_points, get_tracks_by_nodegroups, build_tie_graph_nextsight, split_track, merge_tracks, split_track_reid
 from reid import Encode, CompareTrackList
 
 
@@ -44,7 +44,7 @@ def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25, include_final_split=True):
   merged_tracks = [merge_tracks([tracks[i] for i in c], G) if len(c) > 1 else tracks[next(iter(c))] for c in commH]
 
   if include_final_split:
-    final_tracks = [child for t in merged_tracks for child in split_track(t)]
+    final_tracks = [child for t in merged_tracks for child in split_track_reid(t)]
     return final_track
   else:
     return merged_tracks
