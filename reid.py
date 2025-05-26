@@ -56,4 +56,32 @@ def CompareTrackList(tracks, mode='mean'):
 
     return dist_matrix
 
+def CompareTwoTrackLists(tracks1, tracks2, mode='mean'):
+    """
+    Given two lists of track‐dicts (each with a 'feat' array),
+    returns an (n1 × n2) matrix of distances between every pair.
+    """
+    n1 = len(tracks1)
+    n2 = len(tracks2)
+    dist_matrix = np.zeros((n1, n2), dtype=float)
+
+    for i in range(n1):
+        for j in range(n2):
+            mat = compute_distance_matrix(
+                tracks1[i]['feat'],
+                tracks2[j]['feat'],
+                'cosine'
+            )
+            if mode == 'mean':
+                d = torch.mean(mat)
+            elif mode == 'median':
+                d = torch.median(mat)
+            else:
+                raise ValueError(f"Unknown mode: {mode!r}")
+            dist_matrix[i, j] = float(d)
+        print(f"Compared row {i}/{n1}")
+    return dist_matrix
+
+    
+
     
