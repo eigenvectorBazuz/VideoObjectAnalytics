@@ -45,7 +45,7 @@ def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25, include_final_split=True):
 
   if include_final_split:
     final_tracks = [child for t in merged_tracks for child in split_track_reid(t)]
-    return final_track
+    return final_tracks
   else:
     return merged_tracks
 
@@ -100,7 +100,6 @@ def discover_objects_in_video(video, yolo_model_name, tie_point_params: dict | N
     return tracks_sorted, {'yolo_preds':yolo_preds, 'ties':ties, 'G':G, 'raw_tracks':raw_tracks, 'split_tracklets':tracks}
   else:
     return tracks_sorted
-    # 
 
 
   
