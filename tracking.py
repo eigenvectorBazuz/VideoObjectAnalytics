@@ -163,7 +163,7 @@ def split_track(t):
       t_split.append(subtrack)
     return t_split
 
-def split_track_reid(track):
+def split_track_reid(t):
     flag, error_frames = check_track(t['track'])
     if flag:
       return [t]
