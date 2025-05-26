@@ -76,7 +76,7 @@ def analyze_and_annotate_videos(videos_list, resdir):
 
     for video, ids, tracks in zip(videos_list, joint_ids, results):
         res_file = os.path.join(resdir, video)
-        annotate_video_with_tracks(video, tracks, ids, res_file)
+        annotate_video_with_tracks(video, tracks, res_file, ids)
 
 
 
