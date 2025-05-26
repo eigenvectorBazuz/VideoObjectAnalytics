@@ -47,7 +47,6 @@ class VideoChatBot:
     ----------
     size              – "0.5B" or "7B"
     quant_4bit        – load in 4-bit NF4 weights if True, fp16 otherwise
-    chunk_seconds     – length of each analysed segment
     target_hw         – (H, W) working resolution for analysis
     frames_per_chunk  – number of frames to feed the model for every chunk
     gen_kwargs        – extra kwargs forwarded to `model.generate`
@@ -75,7 +74,6 @@ class VideoChatBot:
         )
         self.processor = AutoProcessor.from_pretrained(model_id)
 
-        self.chunk_seconds = chunk_seconds
         self.target_hw = target_hw
         self.frames_per_chunk = frames_per_chunk
         # sensible defaults, can still be overridden per-call
