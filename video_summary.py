@@ -10,6 +10,10 @@ from PIL import Image
 
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 from bitsandbytes import BitsAndBytesConfig
+from bitsandbytes.nn import Linear4bit
+
+
+
 
 from utils import count_frames, get_video_chunk
 
@@ -95,6 +99,9 @@ class VideoChatBot:
             max_new_tokens=600, do_sample=True, temperature=0.7, top_p=0.9
         )
         self.gen_defaults.update(gen_kwargs)
+
+        has_4bit = any(isinstance(m, Linear4bit) for m in model.modules())
+        print("4-bit layers present:", has_4bit)
 
     # --------------------------------------------------------------------- #
     #  PUBLIC API                                                           #
