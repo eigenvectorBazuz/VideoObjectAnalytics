@@ -117,12 +117,15 @@ class VideoChatBot:
         Feed a list of H×W×3 uint8 frames to the vision-language model
         and return the decoded response string.
         """
+
+        pil_frames = [Image.fromarray(f) for f in frames]
+
         # Build the chat message for this chunk
         messages = [
             {
                 "role": "user",
                 "content": [
-                    *[{"type": "image", "image": img} for img in frames],
+                    *[{"type": "image", "image": img} for img in pil_frames],
                     {"type": "text", "text": user_prompt},
                 ],
             }
