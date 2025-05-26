@@ -100,7 +100,7 @@ class VideoChatBot:
         )
         self.gen_defaults.update(gen_kwargs)
 
-        has_4bit = any(isinstance(m, Linear4bit) for m in model.modules())
+        has_4bit = any(isinstance(m, Linear4bit) for m in self.model.modules())
         print("4-bit layers present:", has_4bit)
 
     # --------------------------------------------------------------------- #
