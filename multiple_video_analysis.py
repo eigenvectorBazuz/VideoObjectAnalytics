@@ -74,8 +74,10 @@ def analyze_and_annotate_videos(videos_list, resdir):
         results.append(tracks)
 
         pkl_file = os.path.join(resdir, str(i) + '.pkl')
-        with open('results.pkl','wb') as f:            
+        print(f'about to save {pkl_file}.................')
+        with open(pkl_file,'wb') as f:            
             pickle.dump({'tracks':tracks, 'debug_data':debug_data}, f)
+        print(f'saved {pkl_file}.................')
 
 
     joint_ids = unify_track_ids(results, 0.25, 'mean')
