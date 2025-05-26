@@ -1,11 +1,14 @@
 import torch
 import numpy as np
 import networkx as nx
+from networkx.algorithms.community import greedy_modularity_communities
 from itertools import chain
+
+from torchreid.reid.metrics.distance import compute_distance_matrix
 
 from utils import count_frames, get_video_chunk
 from utils import has_duplicates, get_repeats #ironic
-from utils import build_separation_pairs, multicut
+from utils import build_separation_pairs, multicut, stack_track_feats
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -159,6 +162,29 @@ def split_track(t):
       subtrack = {'track':piece, 'nodes':c, 'subgraph':S.subgraph(c)}
       t_split.append(subtrack)
     return t_split
+
+def split_track_reid(track):
+    flag, error_frames = check_track(t['track'])
+      if flag:
+          return [t]
+    st = stack_track_feats(t['track'])
+    m = compute_distance_matrix(st, st, 'cosine')
+    adj = (m.cpu().numpy() < 0.25)
+    np.fill_diagonal(adj, False)
+    H = nx.from_numpy_array(adj)
+    # commH = greedy_modularity_communities(H)
+    # print(H)
+    comps = [c for c in nx.connected_components(H) if len(c)>1]
+
+    S = t['subgraph']
+    t_split = []
+    for c in comps:
+      piece = [app for app in t['track'] if (app['frame'], app['box_id']) in c]
+      subtrack = {'track':piece, 'nodes':c, 'subgraph':S.subgraph(c)}
+      t_split.append(subtrack)
+    return t_split
+
+    
 
 def merge_tracks(tracks, G):
     """
