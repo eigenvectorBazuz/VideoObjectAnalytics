@@ -57,7 +57,6 @@ class VideoChatBot:
         self,
         size: str = "0.5B",
         quant_4bit: bool = False,
-        chunk_seconds: int = 5,
         target_hw: Tuple[int, int] = (360, 480),
         frames_per_chunk: int = 12,
         **gen_kwargs,
