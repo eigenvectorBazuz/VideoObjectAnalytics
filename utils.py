@@ -8,6 +8,8 @@ from itertools import combinations
 
 import pulp
 
+from reid import extractor # beware of circular imports here....... 
+
 def has_duplicates(lst):
     return len(lst) != len(set(lst))
 
@@ -111,12 +113,14 @@ def make_yolo_data(yolo_preds):
             # Crop the object using the bounding box coordinates
             img = res.orig_img
             crop = img[int(y1):int(y2), int(x1):int(x2)]
+            feat = extractor(crop)
             dets.append({
                 'bbox': tuple(box.tolist()),
                 'conf': float(c),
                 'cls':  int(cl),
                 'crop': crop,
-                'area': wn * hn
+                'area': wn * hn                
+                'feat': feat
             })
         yolo_data[frame_idx] = dets
     return yolo_data
