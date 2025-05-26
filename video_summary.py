@@ -9,10 +9,16 @@ from typing import List, Sequence, Tuple, Union
 from PIL import Image
 
 from transformers import AutoProcessor, LlavaForConditionalGeneration
+from bitsandbytes import BitsAndBytesConfig
 
 from utils import count_frames, get_video_chunk
 
-
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,                      # enable 4-bit weights
+    bnb_4bit_quant_type="nf4",              # NF4 quantization
+    bnb_4bit_compute_dtype=torch.float16,    # compute in fp16
+    bnb_4bit_use_double_quant=True           # slightly better accuracy
+)
 
 
 def _pick_model_id(size: str) -> str:
@@ -64,8 +70,16 @@ class VideoChatBot:
 
         model_kwargs = dict(device_map="auto", trust_remote_code=True)
         if quant_4bit:
-            model_kwargs["load_in_4bit"] = True
+            # ←—— new: build a bnb-config instead of load_in_4bit flag
+            bnb_config = BitsAndBytesConfig(
+                load_in_4bit=True,                      # enable 4-bit
+                bnb_4bit_quant_type="nf4",              # NF4
+                bnb_4bit_compute_dtype=torch.float16,   # compute in fp16
+                bnb_4bit_use_double_quant=True          # optional double-quant
+            )
+            model_kwargs["quantization_config"] = bnb_config
         else:
+            # keep fp16 as before
             model_kwargs["torch_dtype"] = torch.float16
 
         self.model = (
