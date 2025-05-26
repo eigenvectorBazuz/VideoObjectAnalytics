@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import List, Sequence, Tuple, Union
 from PIL import Image
 
-from transformers import AutoProcessor, LlavaForConditionalGeneration
-from bitsandbytes import BitsAndBytesConfig
+from transformers import AutoProcessor, LlavaForConditionalGeneration, BitsAndBytesConfig
+# from bitsandbytes import BitsAndBytesConfig
 from bitsandbytes.nn import Linear4bit
 
 
