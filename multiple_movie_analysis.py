@@ -1,8 +1,10 @@
+import numpy as np
+import os
+
 from single_movie_analysis import discover_objects_in_video
 from reid import Encode, CompareTwoTrackLists
 from utils import annotate_video_with_tracks
 
-import numpy as np
 
 def unify_track_ids(track_lists, threshold=0.25, mode='mean'):
     """
@@ -61,11 +63,21 @@ def unify_track_ids(track_lists, threshold=0.25, mode='mean'):
     return all_ids_per_clip
 
 
-def analyze_and_annotate_videos(videos_list):
-  results = []
-  for video in videos_list:
-    tracks = discover_objects_in_video(video, 'yolo12x.pt', tie_point_params={'video_chunk_size':50, 'overlap':5, 'grid_size':20}, 
-                               include_final_split=False, return_data=False)
-    results.append(tracks)
+def analyze_and_annotate_videos(videos_list, resdir):
+    results = []
+    for video in videos_list:
+        tracks = discover_objects_in_video(video, 'yolo12x.pt', tie_point_params={'video_chunk_size':50, 'overlap':5, 'grid_size':20}, 
+                                   include_final_split=False, return_data=False)
+        results.append(tracks)
+
+    joint_ids = unify_track_ids(results, th=0.25, 'mean')
+
+    os.makedirs(resdir, exist_ok=True)
+
+    for video, ids, tracks in zip(videos_list, joint_ids, results):
+        res_file = os.path.join(resdir, video)
+        annotate_video_with_tracks(clip_file, tracks, res_file)
+
+
 
 
