@@ -33,7 +33,7 @@ def get_raw_YOLO_detections(video, yolo_model):
   results = yolo_model.predict(video, agnostic_nms=True)
   return results
 
-def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25):
+def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25, include_final_split=True):
   tracks = Encode(tracks)
   dst = CompareTrackList(tracks)
   adj = (dst < 0.25)
@@ -42,15 +42,19 @@ def merge_tracks_by_reid(tracks, G, mean_dst_th=0.25):
   commH = greedy_modularity_communities(H)
   print(H)
   merged_tracks = [merge_tracks([tracks[i] for i in c], G) if len(c) > 1 else tracks[next(iter(c))] for c in commH]
-  final_tracks = [child for t in merged_tracks for child in split_track(t)]
-  return final_tracks
+
+  if include_final_split:
+    final_tracks = [child for t in merged_tracks for child in split_track(t)]
+    return final_track
+  else:
+    return merged_tracks
 
   
   
 
 # video is an mp4 file or some compatible source/iterator
 # TBD - print a list of supported models and make a switch case
-def discover_objects_in_video(video, yolo_model_name, tie_point_params: dict | None = None, return_data=False):
+def discover_objects_in_video(video, yolo_model_name, tie_point_params: dict | None = None, include_final_split=True, return_data=False):
   """
     Discover objects in a video using YOLO + tie-point tracking.
 
@@ -89,7 +93,7 @@ def discover_objects_in_video(video, yolo_model_name, tie_point_params: dict | N
   tracks = [child for t in raw_tracks for child in split_track(t)]
   
   # now merge track/tracklets by ReID
-  final_tracks = merge_tracks_by_reid(tracks, G, mean_dst_th=0.25)
+  final_tracks = merge_tracks_by_reid(tracks, G, mean_dst_th=0.25, include_final_split=include_final_split)
   tracks_sorted = sorted(final_tracks , key=lambda t: min(item['frame'] for item in t['track']))
   
   if return_data:
