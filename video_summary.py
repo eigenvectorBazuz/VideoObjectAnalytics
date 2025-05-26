@@ -10,6 +10,8 @@ from PIL import Image
 
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 
+from utils import count_frames
+
 
 
 
@@ -147,44 +149,33 @@ class VideoChatBot:
         return decoded.split("<|im_start|>assistant")[-1].strip()
 
     def _iter_chunks(
-        self, video_path: Union[str, Path]
-    ) -> "Generator[List[np.ndarray], None, None]":
+        self,
+        video_path: Union[str, Path]
+    ) -> Generator[List[np.ndarray], None, None]:
         """
-        Yield resized frames for each chunk using the user-supplied helpers:
-
-          • get_video_chunk(video_path, start, end)
-          • resize_video(video_path, new_size)  ⟵ optional, see below
+        Yield exactly `frames_per_chunk` resized frames per iteration,
+        by calling THE user-provided get_video_chunk.
         """
-        # ── 1.  quick metadata pass (OpenCV is simplest here) ──────────
-        cap = cv2.VideoCapture(str(video_path))
-        if not cap.isOpened():
-            raise FileNotFoundError(f"Cannot open video: {video_path}")
-        fps = cap.get(cv2.CAP_PROP_FPS) or 30
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        cap.release()
-
-        chunk_len = int(self.chunk_seconds * fps)
+        # 1) get total frame count
+        total = count_frames(video_path)
+    
+        # 2) walk in steps of `frames_per_chunk`
         start = 0
-        while start < total_frames:
-            end = min(start + chunk_len, total_frames)
-
-            # ── 2.  pull the raw frames with YOUR function ─────────────
-            raw_chunk = get_video_chunk(video_path, start, end)  # shape: (F, H, W, 3)
-
-            # ── 3.  pick a uniform subset to feed LLaVA ───────────────
-            keep = _sample_indices(0, raw_chunk.shape[0], self.frames_per_chunk)
-            sampled = raw_chunk[keep]
-
-            # ── 4.  resize each frame to the working resolution ────────
-            # (You already have `resize_video`, but per-frame resize is cheaper
-            #  than re-reading the video, so we do it inline.)
-            frames = [_resize(f, self.target_hw) for f in sampled]
-
+        while start < total:
+            end = min(start + self.frames_per_chunk, total)
+    
+            # 3) pull raw frames using the user’s function
+            raw = get_video_chunk(video_path, start, end)  # shape: (F, H, W, 3)
+    
+            # 4) resize each frame to self.target_hw
+            #    target_hw is (H, W), so we flip for cv2.resize
+            frames = [
+                cv2.resize(f, self.target_hw[::-1], interpolation=cv2.INTER_LINEAR)
+                for f in raw
+            ]
+    
             yield frames
             start = end
-
-
-
 
 
 
