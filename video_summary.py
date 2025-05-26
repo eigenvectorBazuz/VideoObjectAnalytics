@@ -48,6 +48,19 @@ def _sample_indices(start: int, end: int, n: int) -> List[int]:
     step = (end - start) / n
     return [int(start + i * step) for i in range(n)]
 
+def _format_timestamp(seconds: float) -> str:
+    """
+    Convert seconds (can be fractional) to HH:MM:SS format,
+    rounding to the nearest second.
+    """
+    td = timedelta(seconds=round(seconds))
+    # str(td) gives "H:MM:SS" or "D days, H:MM:SS"
+    total_seconds = int(td.total_seconds())
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    secs = total_seconds % 60
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
 
 class VideoChatBot:
     """
