@@ -2,3 +2,4 @@ torch
 ultralytics
 pulp
 torchreid
+bitsandbytes
