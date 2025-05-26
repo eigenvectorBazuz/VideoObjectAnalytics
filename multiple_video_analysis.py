@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pickle
 
 from single_video_analysis import discover_objects_in_video
 from reid import Encode, CompareTwoTrackLists
@@ -65,16 +66,22 @@ def unify_track_ids(track_lists, threshold=0.25, mode='mean'):
 
 def analyze_and_annotate_videos(videos_list, resdir):
     results = []
-    for video in videos_list:
-        tracks = discover_objects_in_video(video, 'yolo12x.pt', tie_point_params={'video_chunk_size':50, 'overlap':5, 'grid_size':20}, 
-                                   include_final_split=False, return_data=False)
+    os.makedirs(resdir, exist_ok=True)
+
+    for i, video in enumerate(videos_list):
+        tracks, debug_data = discover_objects_in_video(video, 'yolo12x.pt', tie_point_params={'video_chunk_size':50, 'overlap':5, 'grid_size':20}, 
+                                   include_final_split=False, return_data=True)
         results.append(tracks)
+
+        pkl_file = os.path.join(resdir, str(i) + '.pkl')
+        with open('results.pkl','wb') as f:            
+            pickle.dump({'tracks':tracks, 'debug_data':debug_data}, f)
+
 
     joint_ids = unify_track_ids(results, 0.25, 'mean')
 
     print(joint_ids)
 
-    os.makedirs(resdir, exist_ok=True)
 
     for video, ids, tracks in zip(videos_list, joint_ids, results):
         res_file = os.path.join(resdir, video)
