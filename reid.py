@@ -18,7 +18,7 @@ extractor = FeatureExtractor(
 # another possible option - compare the means of the vectors.
 # or maybe return the median.
 # or the Hausdorff distance in embedding space.
-def CompareTracks(t1, t2):
+def CompareTracks(t1, t2, mode='mean'):
     crops1 = [app['crop'] for app in t1['track']]
     crops2 = [app['crop'] for app in t2['track']]
 
@@ -27,7 +27,10 @@ def CompareTracks(t1, t2):
 
     mat = compute_distance_matrix(feat1, feat2, 'cosine')
 
-    return torch.mean(mat)
+    if mode == 'mean':
+        return torch.mean(mat)
+    elif mode == 'median':
+        return torch.median(mat)
 
 def Encode(tracks, backbone=None):
     for t in tracks:
